@@ -143,13 +143,11 @@ namespace StructsT8
 		uint16_t back_rotation;
 		uint16_t left_side_rotation;
 		uint16_t right_side_rotation;
-		uint16_t front_counterhit_rotation;
+		uint16_t front_counterhit_rotation; // aka vertical_pushback
 		uint16_t downed_rotation;
 
 		union {
 			struct {
-				uint16_t vertical_pushback;
-				uint16_t standing_moveid;
 				uint16_t default_moveid;
 				uint16_t crouch_moveid;
 				uint16_t counterhit_moveid;
@@ -164,6 +162,8 @@ namespace StructsT8
 				uint16_t crouch_block_moveid;
 				uint16_t wallslump_moveid;
 				uint16_t downed_moveid;
+				uint16_t _0x6C; // unused
+				uint16_t _0xCE; // unused
 			};
 			uint16_t moveids[16];
 		};
@@ -179,7 +179,9 @@ namespace StructsT8
 
 	struct Voiceclip
 	{
-		uint32_t id;
+		int val1;
+		int val2;
+		int val3;
 	};
 
 	struct ExtraMoveProperty
@@ -272,14 +274,14 @@ namespace StructsT8
 		Param params[5];
 	};
 
-	struct UnknownNew
+	struct DialogueManager
 	{
-		uint32_t _0x0;
-		uint16_t _0x4;
-		uint16_t _0x6;
+		uint16_t type; // 0 = intro, 1 = outro, 2 = fate intro
+		uint16_t id;
+		uint32_t _0x4;
 		Requirement* requirements_addr;
-		uint32_t _0xC;
-		uint32_t _0x10;
+		uint32_t voiceclip_enc_value;
+		int facial_anim_idx; // can be -1
 	};
 
 	struct Move //todo
@@ -342,7 +344,7 @@ namespace StructsT8
 	struct MovesetTable
 	{
 		Reactions* reactions;
-		uint64_t _0x8; // what if this was wrongly placed?
+		uint64_t _0x8;
 		uint64_t reactionsCount;
 
 		union {
@@ -401,8 +403,8 @@ namespace StructsT8
 				ThrowCamera* throwCameras;
 				uint64_t throwCamerasCount;
 
-				UnknownNew* _unkown_0x298;
-				uint64_t _unkown_0x298Count;
+				DialogueManager* dialogueManager;
+				uint64_t dialogueManagerCount;
 			};
 		};
 		struct {
@@ -477,8 +479,8 @@ namespace StructsT8
 		char* character_creator_addr;
 		char* date_addr;
 		char* fulldate_addr;
-		uint16_t orig_aliases[57];
-		uint16_t current_aliases[57];
+		uint16_t orig_aliases[60];
+		uint16_t current_aliases[60];
 		uint16_t unknown_values[38];
 		MovesetTable table;
 		MotaList motas;
@@ -853,7 +855,7 @@ namespace StructsT8_gameAddr //todo
 	};
 
 
-	struct UnknownNew
+	struct DialogueManager
 	{
 		uint32_t _0x0;
 		uint16_t _0x4;
@@ -982,8 +984,8 @@ namespace StructsT8_gameAddr //todo
 				gameAddr throwCameras;
 				uint64_t throwCamerasCount;
 
-				gameAddr _unkown_0x298;
-				uint64_t _unkown_0x298Count;
+				gameAddr dialogueManager;
+				uint64_t dialogueManagerCount;
 			};
 			struct {
 				gameAddr listAddr;
