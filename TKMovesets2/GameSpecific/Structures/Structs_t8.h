@@ -847,10 +847,10 @@ namespace StructsT8_gameAddr //todo
 
 	struct Move //todo
 	{
-		EncryptedValue name_key;        // offset 0x0
+		StructsT8::EncryptedValue name_key;        // offset 0x0
 		uint32_t name_key_related[4];   // offset 0x10
 
-		EncryptedValue anim_name_key;        // offset 0x20
+		StructsT8::EncryptedValue anim_name_key;        // offset 0x20
 		uint32_t anim_name_key_related[4];   // offset 0x30
 
 		char *name_addr;                // offset 0x40 - no longer used
@@ -858,10 +858,10 @@ namespace StructsT8_gameAddr //todo
 		uint32_t anim_key1;             // offset 0x50
 		uint32_t anim_key2;             // offset 0x54 - Value always EF00XX00. XX is character ID
 
-		EncryptedValue vuln;            // offset 0x58
+		StructsT8::EncryptedValue vuln;            // offset 0x58
 		uint32_t vuln_related[4];       // offset 0x68
 
-		EncryptedValue hitlevel;        // offset 0x78
+		StructsT8::EncryptedValue hitlevel;        // offset 0x78
 		uint32_t hitlevel_related[4];   // offset 0x88
 
 		gameAddr cancel_addr;           // offset 0x98
@@ -876,10 +876,10 @@ namespace StructsT8_gameAddr //todo
 		uint16_t transition;            // offset 0xCC
 		uint16_t _0xCE_short;           // offset 0xCE
 
-		EncryptedValue ordinal_id1;     // offset 0xD0
+		StructsT8::EncryptedValue ordinal_id1;     // offset 0xD0
 		uint32_t ordinal_id1_related[4]; // offset 0xE0
 
-		EncryptedValue ordinal_id2;     // offset 0xF0
+		StructsT8::EncryptedValue ordinal_id2;     // offset 0xF0
 		uint32_t ordinal_id2_related[4]; // offset 0x100
 
 		gameAddr hit_condition_addr;    // offset 0x110
@@ -897,9 +897,9 @@ namespace StructsT8_gameAddr //todo
 		uint32_t _0x154;               // offset 0x154
 		uint32_t first_active_frame;    // offset 0x158
 		uint32_t last_active_frame;     // offset 0x15C
-		MoveHitbox hitboxes[8];         // offset 0x160 - 0x2E0
+		StructsT8::MoveHitbox hitboxes[8];         // offset 0x160 - 0x2E0
 		uint32_t _0x2E0;               // offset 0x2E0
-		MoveHitboxUnknown _0x2E4[8];    // offset 0x2E4 - 0x440
+		StructsT8::MoveHitboxUnknown _0x2E4[8];    // offset 0x2E4 - 0x440
 		uint32_t _0x444;               // offset 0x444
 	};
 
