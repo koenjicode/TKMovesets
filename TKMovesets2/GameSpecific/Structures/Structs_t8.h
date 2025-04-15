@@ -71,18 +71,41 @@ namespace StructsT8
 		float param_float;
 	};
 
+	struct EncryptedValue
+	{
+		uint64_t value;
+		uint64_t key;
+	};
+
+	struct MoveHitbox
+	{
+		uint32_t startup;
+		uint32_t recovery;
+		uint32_t location;
+		float related_floats[9];
+	};
+
+	struct MoveHitboxUnknown // offset 0x2E4 of a move
+	{
+		int _0x0[3];    // offset 0x0
+		float _0xC[3];  // offset 0xC
+		uint32_t _0x14; // offset 0x14
+		float _0x18[3]; // offset 0x18
+		uint32_t _0x24; // offset 0x24
+	};
+
 	// -- Main data type -- //
 
-	struct PushbackExtradata 
+	struct PushbackExtradata
 	{
-		uint16_t horizontal_offset;
+		int16_t displacement;
 	};
 
 	struct Pushback
 	{
 		uint16_t duration;
 		uint16_t displacement;
-		uint32_t offsets_count;
+		uint32_t offsets_count; // Number of Pushback Extradatas
 		PushbackExtradata* extradata_addr;
 	};
 
@@ -148,9 +171,7 @@ namespace StructsT8
 
 		union {
 			struct {
-				uint16_t vertical_pushback;
-				uint16_t standing_moveid;
-				uint16_t default_moveid;
+				uint16_t default_moveid; // Standing move ID
 				uint16_t crouch_moveid;
 				uint16_t counterhit_moveid;
 				uint16_t crouch_counterhit_moveid;
@@ -164,6 +185,8 @@ namespace StructsT8
 				uint16_t crouch_block_moveid;
 				uint16_t wallslump_moveid;
 				uint16_t downed_moveid;
+				uint16_t _unk1;
+				uint16_t _unk2;
 			};
 			uint16_t moveids[16];
 		};
@@ -179,7 +202,9 @@ namespace StructsT8
 
 	struct Voiceclip
 	{
-		uint32_t id;
+		uint32_t folder; // folder of voice
+  	uint32_t val2;
+  	uint32_t clip; // ID of the clip
 	};
 
 	struct ExtraMoveProperty
@@ -212,36 +237,13 @@ namespace StructsT8
 		Input* input_addr;
 	};
 
+	// TODO: Study and add proper fields later
 	struct Projectile
 	{
-		uint32_t vfx_id;
-		int32_t _0x4_int;
-		uint32_t vfx_variation_id;
-		int32_t _0xC_int;
-		int32_t _0x10_int;
-		int32_t _0x14_int;
-		uint32_t delay; // Frames before both velocity components can be applied
-		uint32_t vertical_velocity;
-		uint32_t horizontal_velocity;
-		int32_t _0x24_int; // 0: disable projectile
-		uint32_t duration;
-		uint32_t no_collision; // default: 0. Non-zero: no collision
-		uint32_t size; // 0: no collision
-		int32_t _0x34_int;
-		uint32_t hit_level;
-		int32_t _0x3C_int[6];
-		uint32_t voiceclip_on_hit;
-		int32_t _0x58_int;
-		int32_t _0x5C_int;
-		HitCondition* hit_condition_addr;
-		Cancel* cancel_addr;
-		int32_t _0x70_int;
-		int32_t _0x74_int;
-		uint32_t can_hitbox_connect;
-		int32_t _0x7C_int;
-		int32_t _0x80_int;
-		uint32_t gravity;
-		int32_t _0x88_int[8];
+		uint32_t u1[35];             // Offset: 0x0
+		HitCondition* hit_condition_addr; // Offset: 0x90
+		Cancel* cancel_addr;        // Offset: 0x98
+		uint32_t u2[16];
 	};
 
 	struct CameraData
@@ -259,7 +261,7 @@ namespace StructsT8
 		CameraData* cameradata_addr;
 	};
 
-	struct UnknownParryRelated
+	struct ParryAbleMove
 	{
 		uint32_t value;
 	};
@@ -268,73 +270,76 @@ namespace StructsT8
 	struct OtherMoveProperty
 	{
 		Requirement* requirements_addr;
-		uint32_t extraprop; // 881 list end value & extraprop values
+		uint32_t extraprop; // 1100 list end value & extraprop values
 		Param params[5];
 	};
 
-	struct UnknownNew
+	struct DialogueManager
 	{
-		uint32_t _0x0;
-		uint16_t _0x4;
-		uint16_t _0x6;
+		uint16_t type; // 0 = Intro, 1 = Outro, 2 = Fate
+		uint16_t id;
+		uint32_t _0x4;
 		Requirement* requirements_addr;
-		uint32_t _0xC;
-		uint32_t _0x10;
+		uint32_t voiceclip_key;
+		uint32_t facial_anim_idx;
 	};
 
-	struct Move //todo
+	struct Move
 	{
-		Byte move_name_related[4];
-		Byte move_anim_name_related[4];
-		char* name_addr;
-		char* anim_name_addr;
-		Byte anim_addr[8]; // now encrypted
-		uint32_t vuln;
-		uint32_t hitlevel;
-		Cancel* cancel_addr;
-		Cancel* _0x30_cancel_addr;
-		int32_t _0x38_int__0x30_related;
-		int32_t _0x3C_int;
-		Cancel* _0x40_cancel_addr;
-		int32_t _0x48_int__0x40_related;
-		int32_t _0x4C_int;
-		Cancel* _0x50_cancel_addr;
-		uint32_t _0x58_int__0x50_related;
-		uint16_t transition;
-		int16_t _0x5E_short;
-		uint16_t moveId_val1; // Clearly related to move ID
-		uint16_t moveId_val2; // Clearly related to current character ID
-		int16_t _0x64_short; // Might be the same member as 0x66 (int32)
-		int16_t _0x66_short;
-		HitCondition* hit_condition_addr; // 0x68
-		uint32_t _0x70;
-		uint32_t _0x74;
-		int32_t anim_len;
-		uint32_t airborne_start;
-		uint32_t airborne_end;
-		uint32_t ground_fall; // Not confirmed
-		Voiceclip* voicelip_addr; // Can be NULL // 0x88
-		ExtraMoveProperty* extra_move_property_addr; // Can be NULL
-		OtherMoveProperty* move_start_extraprop_addr; // Can be NULL
-		OtherMoveProperty* move_end_extraprop_addr; // Can be NULL
-		int32_t _0xA8_int; // extra body properties such as neck tracking/combo counter etc....
-		uint32_t _0xAC_int;
-		uint32_t first_active_frame;
-		uint32_t last_active_frame;
-		uint32_t first_active_frame_2;
-		uint32_t last_active_frame_2;
-		uint32_t hitbox_location; // 0xC0
-		uint32_t _0xC4[8]; // 0xC4 - 0xE0
-		uint32_t first_active_frame_3; // 0xE4
-		uint32_t last_active_frame_3; // 0xE8
-		uint32_t hitbox_location_2; // 0xEC
-		uint32_t _0xF0[73]; // 0xF0 - 0x214
-		uint16_t collision;
-		uint16_t distance;
-		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
-			Param values[11];
-		} _0x21C[8];
-		uint32_t _0x37C;
+		EncryptedValue name_key;        // offset 0x0 // Done in patch 1.09
+		uint32_t name_key_related[4];   // offset 0x10
+
+		EncryptedValue anim_name_key;        // offset 0x20
+		uint32_t anim_name_key_related[4];   // offset 0x30
+
+		char *name_addr;                // offset 0x40 - no longer used
+		char *anim_name_addr;           // offset 0x48 - no longer used
+		uint32_t anim_key1;             // offset 0x50
+		uint32_t anim_key2;             // offset 0x54 - Value always EF00XX00. XX is character ID
+
+		EncryptedValue vuln;            // offset 0x58 // Hurtboxes
+		uint32_t vuln_related[4];       // offset 0x68
+
+		EncryptedValue hitlevel;        // offset 0x78
+		uint32_t hitlevel_related[4];   // offset 0x88
+
+		Cancel *cancel_addr;            // offset 0x98 // Seems to be the only one used, rest are unused.
+		Cancel *cancel1_addr;           // offset 0xA0
+		int32_t cancel1_related;        // offset 0xA8
+		int32_t cancel1_related2;       // offset 0xAC
+		Cancel *cancel2_addr;           // offset 0xB0
+		int32_t cancel2_related;        // offset 0xB8
+		int32_t cancel2_related2;       // offset 0xBC
+		Cancel *cancel_addr3;           // offset 0xC0
+		uint32_t cancel3_related;       // offset 0xC8
+		uint16_t transition;            // offset 0xCC
+		uint16_t _0xCE_short;           // offset 0xCE
+
+		EncryptedValue ordinal_id1;     // offset 0xD0 // Used for all parries?
+		uint32_t ordinal_id1_related[4]; // offset 0xE0
+
+		EncryptedValue ordinal_id2;     // offset 0xF0
+		uint32_t ordinal_id2_related[4]; // offset 0x100
+
+		HitCondition* hit_condition_addr; // offset 0x110 // Requirement, Damage, Which Reaction List to perform.
+		uint32_t _0x118;                // offset 0x118
+		uint32_t _0x11C;                // offset 0x11C
+		uint32_t anim_len;              // offset 0x120
+		uint32_t airborne_start;        // offset 0x124
+		uint32_t airborne_end;          // offset 0x128
+		uint32_t ground_fall;           // offset 0x12C
+		Voiceclip* voicelip_addr;       // offset 0x130 Can be NULL
+		ExtraMoveProperty* extra_move_property_addr; // offset 0x138 Can be NULL
+		OtherMoveProperty* move_start_extraprop_addr; // offset 0x140 Can be NULL
+		OtherMoveProperty* move_end_extraprop_addr; // offset 0x148 Can be NULL
+		uint32_t u15;                   // offset 0x150 extra body properties such as neck tracking/combo counter etc....
+		uint32_t _0x154;                // offset 0x154
+		uint32_t first_active_frame;    // offset 0x158
+		uint32_t last_active_frame;     // offset 0x15C
+		MoveHitbox hitboxes[8];         // offset 0x160 - 0x2E0
+		uint32_t _0x2E0;                // offset 0x2E0
+		MoveHitboxUnknown _0x2E4[8];    // offset 0x2E4 - 0x440
+		uint32_t _0x444;                // offset 0x444
 	};
 
 	// -- Other -- //
@@ -392,8 +397,8 @@ namespace StructsT8
 				Input* input;
 				uint64_t inputCount;
 
-				UnknownParryRelated* unknownParryRelated;
-				uint64_t unknownParryRelatedCount;
+				ParryAbleMove* parryableMoves;
+				uint64_t parryableMovesCount;
 
 				CameraData* cameraData;
 				uint64_t cameraDataCount;
@@ -401,8 +406,8 @@ namespace StructsT8
 				ThrowCamera* throwCameras;
 				uint64_t throwCamerasCount;
 
-				UnknownNew* _unkown_0x298;
-				uint64_t _unkown_0x298Count;
+				DialogueManager* dialoguesData;
+				uint64_t dialoguesDataCount;
 			};
 		};
 		struct {
@@ -471,14 +476,14 @@ namespace StructsT8
 		bool isInitialized;
 		bool _0x3;
 		char _0x4[4];
-		char _0x8[4]; // string "TEK\0"
+		char _0x8[4]; // string "TEK"
 		uint32_t _0xC;
 		char* character_name_addr;
 		char* character_creator_addr;
 		char* date_addr;
 		char* fulldate_addr;
-		uint16_t orig_aliases[57];
-		uint16_t current_aliases[57];
+		uint16_t orig_aliases[60];
+		uint16_t current_aliases[60];
 		uint16_t unknown_values[38];
 		MovesetTable table;
 		MotaList motas;
@@ -700,7 +705,7 @@ namespace StructsT8_gameAddr //todo
 	{
 		uint16_t duration;
 		uint16_t displacement;
-		uint32_t offsets_count;
+		uint32_t offsets_count; // Number of Pushback Extradatas
 		gameAddr extradata_addr;
 	};
 
@@ -755,9 +760,7 @@ namespace StructsT8_gameAddr //todo
 
 		union {
 			struct {
-				uint16_t vertical_pushback;
-				uint16_t standing_moveid;
-				uint16_t default_moveid;
+				uint16_t default_moveid; // Standing move ID
 				uint16_t crouch_moveid;
 				uint16_t counterhit_moveid;
 				uint16_t crouch_counterhit_moveid;
@@ -771,6 +774,8 @@ namespace StructsT8_gameAddr //todo
 				uint16_t crouch_block_moveid;
 				uint16_t wallslump_moveid;
 				uint16_t downed_moveid;
+				uint16_t _unk1;
+				uint16_t _unk2;
 			};
 			uint16_t moveids[16];
 		};
@@ -797,36 +802,13 @@ namespace StructsT8_gameAddr //todo
 		gameAddr input_addr;
 	};
 
+	// TODO: Fix it later
 	struct Projectile
 	{
-		uint32_t vfx_id;
-		int32_t _0x4_int;
-		uint32_t vfx_variation_id;
-		int32_t _0xC_int;
-		int32_t _0x10_int;
-		int32_t _0x14_int;
-		uint32_t delay; // Frames before both velocity components can be applied
-		uint32_t vertical_velocity;
-		uint32_t horizontal_velocity;
-		int32_t _0x24_int; // 0: disable projectile
-		uint32_t duration;
-		uint32_t no_collision; // default: 0. Non-zero: no collision
-		uint32_t size; // 0: no collision
-		int32_t _0x34_int;
-		uint32_t hit_level;
-		int32_t _0x3C_int[6];
-		uint32_t voiceclip_on_hit;
-		int32_t _0x58_int;
-		int32_t _0x5C_int;
-		gameAddr hit_condition_addr;
-		gameAddr cancel_addr;
-		int32_t _0x70_int;
-		int32_t _0x74_int;
-		uint32_t can_hitbox_connect;
-		int32_t _0x7C_int;
-		int32_t _0x80_int;
-		uint32_t gravity;
-		int32_t _0x88_int[8];
+		uint32_t u1[35];             // Offset: 0x0
+		gameAddr hit_condition_addr; // Offset: 0x90
+		gameAddr cancel_addr;        // Offset: 0x98
+		uint32_t u2[16];
 	};
 
 
@@ -839,83 +821,86 @@ namespace StructsT8_gameAddr //todo
 	struct OtherMoveProperty
 	{
 		gameAddr requirements_addr;
-		uint32_t extraprop; // 881 list end value & extraprop values
+		uint32_t extraprop; // 1100 list end value & extraprop values
 		Param param[5];
 	};
 
-	struct ExtraMoveProperty //todo
+	struct ExtraMoveProperty
 	{
 		uint32_t starting_frame;
 		uint32_t _0x4_int;
-		gameAddr* requirements_addr;
+		gameAddr requirements_addr;
 		uint32_t id;
 		Param param[5];
 	};
 
 
-	struct UnknownNew
+	struct DialogueManager
 	{
-		uint32_t _0x0;
-		uint16_t _0x4;
-		uint16_t _0x6;
-		gameAddr* requirements_addr;
-		uint32_t _0xC;
-		uint32_t _0x10;
+		uint16_t type; // 0 = Intro, 1 = Outro, 2 = Fate
+		uint16_t id;
+		uint32_t _0x4;
+		gameAddr requirements_addr;
+		uint32_t voiceclip_key;
+		uint32_t facial_anim_idx;
 	};
 
-	struct Move
+	struct Move //todo
 	{
-		Byte move_name_related[4];
-		Byte move_anim_name_related[4];
-		char* name_addr;
-		char* anim_name_addr;
-		Byte anim_addr[8]; // now encrypted
-		uint32_t vuln;
-		uint32_t hitlevel;
-		gameAddr cancel_addr;
-		gameAddr _0x30_cancel_addr;
-		int32_t _0x38_int__0x30_related;
-		int32_t _0x3C_int;
-		gameAddr _0x40_cancel_addr;
-		int32_t _0x48_int__0x40_related;
-		int32_t _0x4C_int;
-		gameAddr _0x50_cancel_addr;
-		uint32_t _0x58_int__0x50_related;
-		uint16_t transition;
-		int16_t _0x5E_short;
-		uint16_t moveId_val1; // Clearly related to move ID
-		uint16_t moveId_val2; // Clearly related to current character ID
-		int16_t _0x64_short; // Might be the same member as 0x66 (int32)
-		int16_t _0x66_short;
-		gameAddr hit_condition_addr; // 0x68
-		uint32_t _0x70;
-		uint32_t _0x74;
-		int32_t anim_len;
-		uint32_t airborne_start;
-		uint32_t airborne_end;
-		uint32_t ground_fall; // Not confirmed
-		gameAddr voicelip_addr; // Can be NULL // 0x88
-		gameAddr extra_move_property_addr; // Can be NULL
-		gameAddr move_start_extraprop_addr; // Can be NULL
-		gameAddr move_end_extraprop_addr; // Can be NULL
-		int32_t _0xA8_int; // extra body properties such as neck tracking/combo counter etc....
-		uint32_t _0xAC_int;
-		uint32_t first_active_frame;
-		uint32_t last_active_frame;
-		uint32_t first_active_frame_2;
-		uint32_t last_active_frame_2;
-		uint32_t hitbox_location; // 0xC0
-		uint32_t _0xC4[8]; // 0xC4 - 0xE0
-		uint32_t first_active_frame_3; // 0xE4
-		uint32_t last_active_frame_3; // 0xE8
-		uint32_t hitbox_location_2; // 0xEC
-		uint32_t _0xF0[73]; // 0xF0 - 0x214
-		uint16_t collision;
-		uint16_t distance;
-		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
-			Param values[11];
-		} _0x21C[8];
-		uint32_t _0x37C;
+		EncryptedValue name_key;        // offset 0x0
+		uint32_t name_key_related[4];   // offset 0x10
+
+		EncryptedValue anim_name_key;        // offset 0x20
+		uint32_t anim_name_key_related[4];   // offset 0x30
+
+		char *name_addr;                // offset 0x40 - no longer used
+		char *anim_name_addr;           // offset 0x48 - no longer used
+		uint32_t anim_key1;             // offset 0x50
+		uint32_t anim_key2;             // offset 0x54 - Value always EF00XX00. XX is character ID
+
+		EncryptedValue vuln;            // offset 0x58
+		uint32_t vuln_related[4];       // offset 0x68
+
+		EncryptedValue hitlevel;        // offset 0x78
+		uint32_t hitlevel_related[4];   // offset 0x88
+
+		gameAddr cancel_addr;           // offset 0x98
+		gameAddr cancel1_addr;          // offset 0xA0
+		int32_t cancel1_related;        // offset 0xA8
+		int32_t cancel1_related2;       // offset 0xAC
+		gameAddr cancel2_addr;          // offset 0xB0
+		int32_t cancel2_related;        // offset 0xB8
+		int32_t cancel2_related2;       // offset 0xBC
+		gameAddr cancel_addr3;          // offset 0xC0
+		uint32_t cancel3_related;       // offset 0xC8
+		uint16_t transition;            // offset 0xCC
+		uint16_t _0xCE_short;           // offset 0xCE
+
+		EncryptedValue ordinal_id1;     // offset 0xD0
+		uint32_t ordinal_id1_related[4]; // offset 0xE0
+
+		EncryptedValue ordinal_id2;     // offset 0xF0
+		uint32_t ordinal_id2_related[4]; // offset 0x100
+
+		gameAddr hit_condition_addr;    // offset 0x110
+		uint32_t _0x118;                // offset 0x118
+		uint32_t _0x11C;                // offset 0x11C
+		uint32_t anim_len;              // offset 0x120
+		uint32_t airborne_start;        // offset 0x124
+		uint32_t airborne_end;          // offset 0x128
+		uint32_t ground_fall;           // offset 0x12C
+		gameAddr voicelip_addr;        // offset 0x130 Can be NULL
+		gameAddr extra_move_property_addr; // offset 0x138 Can be NULL
+		gameAddr move_start_extraprop_addr; // offset 0x140 Can be NULL
+		gameAddr move_end_extraprop_addr; // offset 0x148 Can be NULL
+		uint32_t u15;                   // offset 0x150 extra body properties such as neck tracking/combo counter etc....
+		uint32_t _0x154;               // offset 0x154
+		uint32_t first_active_frame;    // offset 0x158
+		uint32_t last_active_frame;     // offset 0x15C
+		MoveHitbox hitboxes[8];         // offset 0x160 - 0x2E0
+		uint32_t _0x2E0;               // offset 0x2E0
+		MoveHitboxUnknown _0x2E4[8];    // offset 0x2E4 - 0x440
+		uint32_t _0x444;               // offset 0x444
 	};
 
 	// -- Other -- //
@@ -973,8 +958,8 @@ namespace StructsT8_gameAddr //todo
 				gameAddr input;
 				uint64_t inputCount;
 
-				gameAddr unknownParryRelated;
-				uint64_t unknownParryRelatedCount;
+				gameAddr parryableMoves;
+				uint64_t parryableMovesCount;
 
 				gameAddr cameraData;
 				uint64_t cameraDataCount;
@@ -982,8 +967,8 @@ namespace StructsT8_gameAddr //todo
 				gameAddr throwCameras;
 				uint64_t throwCamerasCount;
 
-				gameAddr _unkown_0x298;
-				uint64_t _unkown_0x298Count;
+				gameAddr dialoguesData;
+				uint64_t dialoguesDataCount;
 			};
 			struct {
 				gameAddr listAddr;
@@ -1021,14 +1006,14 @@ namespace StructsT8_gameAddr //todo
 		bool isInitialized;
 		bool _0x3;
 		char _0x4[4];
-		char _0x8[4]; // string "TEK\0"
+		char _0x8[4]; // string "TEK"
 		uint32_t _0xC;
 		char* character_name_addr;
 		char* character_creator_addr;
 		char* date_addr;
 		char* fulldate_addr;
-		uint16_t orig_aliases[57];
-		uint16_t current_aliases[57];
+		uint16_t orig_aliases[60];
+		uint16_t current_aliases[60];
 		uint16_t unknown_aliases[38];
 		MovesetTable table;
 		MotaList motas;
