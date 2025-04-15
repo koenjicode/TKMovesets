@@ -17,6 +17,8 @@ namespace GameVersions
 	{
 		enum
 		{
+			DEFAULT = 0,
+
 			CLOSED_NETWORK_TEST,
 		};
 	}

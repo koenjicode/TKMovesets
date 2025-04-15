@@ -22,11 +22,11 @@
 const GameInfo cg_gamesInfo[] = {
 	{
 		// -- T8 -- //
-		.name = "Tekken 8 CNT",
+		.name = "Tekken 8",
 		.processName = "Polaris-Win64-Shipping.exe",
 		.movesetNamePrefix = "T8_",
 		.gameId = GameId_T8,
-		.minorVersion = GameVersions::T8::CLOSED_NETWORK_TEST,
+		.minorVersion = GameVersions::T8::DEFAULT,
 		.characterCount = 2,
 		.ptrSize = 8,
 		.flags = 0,
@@ -50,6 +50,7 @@ const GameInfo cg_gamesInfo[] = {
 
 	// -- T7 -- //
 	{
+		.separatorText = "Tekken 7",
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
 		.movesetNamePrefix = "T7_",
