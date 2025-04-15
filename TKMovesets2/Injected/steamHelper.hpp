@@ -27,7 +27,7 @@ namespace SteamHelper
 	ISteamHTTP* SteamHTTP();
 	ISteamController* SteamController();
 	ISteamUGC* SteamUGC();
-	ISteamAppList* SteamAppList();
+	// ISteamAppList* SteamAppList();
 	ISteamMusic* SteamMusic();
 	ISteamMusicRemote* SteamMusicRemote();
 	ISteamHTMLSurface* SteamHTMLSurface();
@@ -61,7 +61,7 @@ public:
 	ISteamHTTP* pSteamHTTP;
 	ISteamController* pController;
 	ISteamUGC* pSteamUGC;
-	ISteamAppList* pSteamAppList;
+	// ISteamAppList* pSteamAppList;
 	ISteamMusic* pSteamMusic;
 	ISteamMusicRemote* pSteamMusicRemote;
 	ISteamHTMLSurface* pSteamHTMLSurface;

@@ -30,7 +30,7 @@ namespace SteamHelper
 	ISteamHTTP* SteamHTTP() { return g_steamHelper.pSteamHTTP; }
 	ISteamController* SteamController() { return g_steamHelper.pController; }
 	ISteamUGC* SteamUGC() { return g_steamHelper.pSteamUGC; }
-	ISteamAppList* SteamAppList() { return g_steamHelper.pSteamAppList; }
+	// ISteamAppList* SteamAppList() { return g_steamHelper.pSteamAppList; }
 	ISteamMusic* SteamMusic() { return g_steamHelper.pSteamMusic; }
 	ISteamMusicRemote* SteamMusicRemote() { return g_steamHelper.pSteamMusicRemote; }
 	ISteamHTMLSurface* SteamHTMLSurface() { return g_steamHelper.pSteamHTMLSurface; }
@@ -65,7 +65,7 @@ bool SteamHelperClass::Init(HMODULE steamModule)
 	pSteamHTTP = ((decltype(&SteamHTTP))GetProcAddress(steamModule, "SteamHTTP"))();
 	pController = ((decltype(&SteamController))GetProcAddress(steamModule, "SteamController"))();
 	pSteamUGC = ((decltype(&SteamUGC))GetProcAddress(steamModule, "SteamUGC"))();
-	pSteamAppList = ((decltype(&SteamAppList))GetProcAddress(steamModule, "SteamAppList"))();
+	// pSteamAppList = ((decltype(&SteamAppList))GetProcAddress(steamModule, "SteamAppList"))();
 	pSteamMusic = ((decltype(&SteamMusic))GetProcAddress(steamModule, "SteamMusic"))();
 	pSteamMusicRemote = ((decltype(&SteamMusicRemote))GetProcAddress(steamModule, "SteamMusicRemote"))();
 	pSteamHTMLSurface = ((decltype(&SteamHTMLSurface))GetProcAddress(steamModule, "SteamHTMLSurface"))();
