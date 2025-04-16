@@ -496,8 +496,8 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 	Byte* motasListBlock;
 	char* nameBlock;
 	Byte* movesetBlock;
-	Byte* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
-	Byte* motaCustomBlock; // This is also a custom block because not contiguously stored
+	Byte* animationBlock; // Currently not possible to grab Animations , we'll have the block present but we won't fill it with information.
+	Byte* motaCustomBlock; // Same with this one ):
 	Byte* movelistBlock;
 
 	// The size in bytes of the same blocks
@@ -772,8 +772,15 @@ std::string ExtractorT8::GetPlayerCharacterName(gameAddr playerAddress)
 	}
 
 	char characterName[32];
-	m_game.ReadBytes(movesetAddr + 0x2E8, characterName, sizeof(characterName));
-	characterName[sizeof(characterName) - 1] = '\0';
+
+	uint8_t CharaId = m_process.readUInt8(playerAddress + m_game.GetValue("chara_id_offset"));
+
+	auto item = m_polarisCharacterNamesMap.find(CharaId);
+	if (item != m_polarisCharacterNamesMap.end()) {
+		// Copy string from map into fixed-size char array, safely
+		strncpy(characterName, item->second.c_str(), sizeof(characterName) - 1);
+		characterName[sizeof(characterName) - 1] = '\0';
+	}
 
 	auto name_len = strlen(characterName);
 
