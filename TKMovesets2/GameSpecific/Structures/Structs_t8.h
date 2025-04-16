@@ -484,7 +484,9 @@ namespace StructsT8
 		char* fulldate_addr;
 		uint16_t orig_aliases[60];
 		uint16_t current_aliases[60];
-		uint16_t unknown_values[38];
+		uint16_t unknown_aliases[32];
+		uint32_t technical_id1;
+		uint32_t technical_id2;
 		MovesetTable table;
 		MotaList motas;
 	};
@@ -1014,7 +1016,9 @@ namespace StructsT8_gameAddr //todo
 		char* fulldate_addr;
 		uint16_t orig_aliases[60];
 		uint16_t current_aliases[60];
-		uint16_t unknown_aliases[38];
+		uint16_t unknown_aliases[32];
+		uint32_t technical_id1;
+		uint32_t technical_id2;
 		MovesetTable table;
 		MotaList motas;
 	};

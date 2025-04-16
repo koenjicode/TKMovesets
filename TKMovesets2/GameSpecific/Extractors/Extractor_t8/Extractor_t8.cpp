@@ -329,7 +329,10 @@ void ExtractorT8::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* t
 	gameAddr tableStartAddr = (gameAddr)table->reactions;
 	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
 	memcpy(offsets, table, sizeof(MovesetTable));
-	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, sizeof(MovesetTable) / 8 / 2);
+	// We're converting offset of reaction-list separately from everything else
+	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, 1);
+	// Now we convert rest of the pointers to offsets
+	Helpers::convertPtrsToOffsets(&offsets->requirement, tableStartAddr, 16, (sizeof(MovesetTable) / 8 / 2) - 1);
 }
 
 Byte* ExtractorT8::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::MovesetTable& table)
@@ -493,12 +496,12 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 	Byte* offsetListBlock;
 	Byte* movesetInfoBlock;
 	Byte* tableBlock;
-	Byte* motasListBlock;
+	Byte* motasListBlock; // Not Possible
 	char* nameBlock;
 	Byte* movesetBlock;
 	Byte* animationBlock; // Currently not possible to grab Animations , we'll have the block present but we won't fill it with information.
 	Byte* motaCustomBlock; // Same with this one ):
-	Byte* movelistBlock;
+	Byte* movelistBlock; // We don't know how to build this exactly either. So best to leave it for now.
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
@@ -506,7 +509,7 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 	uint64_t s_offsetListBlock = sizeof(TKMovesetHeaderBlocks);
 	uint64_t s_movesetInfoBlock = offsetof(MovesetInfo, table);
 	uint64_t s_tableBlock = sizeof(MovesetTable);
-	uint64_t s_motasListBlock = sizeof(MotaList);
+	uint64_t s_motasListBlock;
 	uint64_t s_nameBlock;
 	uint64_t s_movesetBlock;
 	uint64_t s_animationBlock;
