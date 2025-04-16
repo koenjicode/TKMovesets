@@ -21,14 +21,11 @@ using namespace StructsT8;
 // -- Static helpers -- //
 
 // Converts absolute ptr into indexes before saving to file
-static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable* offsets, gameAddr nameStart, std::map<gameAddr, uint64_t>& animOffsetMap)
+static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable* offsets)
 {
 	// Convert move ptrs
 	for (auto& move : StructIterator<gAddr::Move>(movesetBlock, offsets->move, table.moveCount))
 	{
-		move.name_addr -= nameStart;
-		move.anim_name_addr -= nameStart;
-		// move.anim_addr = animOffsetMap[move.anim_addr];
 		TO_INDEX(move.cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move.cancel1_addr, table.cancel, Cancel);
 		TO_INDEX(move.cancel2_addr, table.cancel, Cancel);
@@ -109,6 +106,18 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 	for (auto& moveEndingProp : StructIterator<gAddr::OtherMoveProperty>(movesetBlock, offsets->moveEndingProp, table.moveEndingPropCount))
 	{
 		TO_INDEX(moveEndingProp.requirements_addr, table.requirement, Requirement);
+	}
+
+	// Convert move end prop ptrs
+	for (auto& extraMoveProperty : StructIterator<gAddr::ExtraMoveProperty>(movesetBlock, offsets->extraMoveProperty, table.extraMovePropertyCount))
+	{
+		TO_INDEX(extraMoveProperty.requirements_addr, table.requirement, Requirement);
+	}
+
+	// Convert move end prop ptrs
+	for (auto& dialogueManager : StructIterator<gAddr::DialogueManager>(movesetBlock, offsets->dialoguesData, table.dialoguesDataCount))
+	{
+		TO_INDEX(dialogueManager.requirements_addr, table.requirement, Requirement);
 	}
 }
 
@@ -328,8 +337,8 @@ void ExtractorT8::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* t
 	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
 	gameAddr tableStartAddr = (gameAddr)table->reactions;
 	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
-	memcpy(offsets, table, sizeof(MovesetTable));
-	// We're converting offset of reaction-list separately from everything else
+	*offsets = *table;
+
 	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, 1);
 	// Now we convert rest of the pointers to offsets
 	Helpers::convertPtrsToOffsets(&offsets->requirement, tableStartAddr, 16, (sizeof(MovesetTable) / 8 / 2) - 1);
@@ -338,25 +347,14 @@ void ExtractorT8::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* t
 Byte* ExtractorT8::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::MovesetTable& table)
 {
 	gameAddr blockStart = (gameAddr)table.reactions;
-	gameAddr blockEnd = (gameAddr)table.throwCameras + (sizeof(ThrowCamera) * table.throwCamerasCount);
+	gameAddr blockEnd = (gameAddr)table.dialoguesData + (sizeof(DialogueManager) * table.dialoguesDataCount);
 	return allocateAndReadBlock(blockStart, blockEnd, size_out);
 }
 
-char* ExtractorT8::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
+char* ExtractorT8::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT8_gameAddr::MovesetInfo& movesetHeader)
 {
-	gameAddr nameBlockEnd;
-	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
-
-	// Prefix we apply to recognize movesets we extracted
-	const char* namePrefix = MOVESET_EXTRACTED_NAME_PREFIX;
-	size_t toCopy = strlen(namePrefix);
-	size_t charactersToReplace = 1; // Replace the first [
-
-	nameBlockStart = movesetAddr + 0x2E8 - (toCopy - charactersToReplace);
-	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + 0x2E8 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
-	memcpy(nameBlock, namePrefix, toCopy);
-
-	return nameBlock;
+	// Name Blocks are no longer used for Tekken 8, use a similar method to Tekken 6 of structuring its data blocks.
+	return nullptr;
 }
 
 Byte* ExtractorT8::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
@@ -371,7 +369,9 @@ Byte* ExtractorT8::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 {
 	// Default size if we don't actually extract this block
 	size_out = 8;
+	return nullptr;
 
+	// TODO: Update this probably at some point in time.
 	if (settings & ExtractSettings_DisplayableMovelist)
 	{
 		gameAddr managerAddr = m_game.ReadPtrPath("movelist_manager_addr");
@@ -496,12 +496,8 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 	Byte* offsetListBlock;
 	Byte* movesetInfoBlock;
 	Byte* tableBlock;
-	Byte* motasListBlock; // Not Possible
-	char* nameBlock;
+	// char* nameBlock;
 	Byte* movesetBlock;
-	Byte* animationBlock; // Currently not possible to grab Animations , we'll have the block present but we won't fill it with information.
-	Byte* motaCustomBlock; // Same with this one ):
-	Byte* movelistBlock; // We don't know how to build this exactly either. So best to leave it for now.
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
@@ -509,12 +505,8 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 	uint64_t s_offsetListBlock = sizeof(TKMovesetHeaderBlocks);
 	uint64_t s_movesetInfoBlock = offsetof(MovesetInfo, table);
 	uint64_t s_tableBlock = sizeof(MovesetTable);
-	uint64_t s_motasListBlock;
-	uint64_t s_nameBlock;
+	// uint64_t s_nameBlock;
 	uint64_t s_movesetBlock;
-	uint64_t s_animationBlock;
-	uint64_t s_motaCustomBlock;
-	uint64_t s_movelistBlock;
 
 	// Establish the list of default properties
 	TKMovesetProperty customProperties[1] = {
@@ -539,57 +531,36 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// We will read the table containing <list_ptr:list_size>, in here.
 	// Offsets will contain the same as table but converted to offsets, in order to convert the absolute pointers contained within the moveset to offsets
-	gAddr::MovesetTable table{};
-	gAddr::MovesetTable* offsets = &movesetHeader.table;
-
-	// Contains absolute addresses of mota file within the game's memory
-	MotaList motasList{};
+	gAddr::MovesetTable table = movesetHeader.table;
+	gAddr::MovesetTable offsets = movesetHeader.table;
 
 	// Assign these blocks right away because they're fixed-size structures we write into
 	headerBlock = (Byte*)&customHeader;
 	customPropertiesBlock = (Byte*)&customProperties;
 	offsetListBlock = (Byte*)&offsetList;
-	tableBlock = (Byte*)offsets;
-	motasListBlock = (Byte*)&motasList;
+	tableBlock = (Byte*)&offsets;
 	movesetInfoBlock = (Byte*)&movesetHeader;
 
 	// Fill table containing lists of move, lists of cancels, etc...
-	FillMovesetTables(movesetAddr, &table, offsets);
+	FillMovesetTables(movesetAddr, &table, &offsets);
 	progress = 10;
 
 	// Reads block containing the actual moveset data
 	// Also get a pointer to our movelist in our own allocated memory. Will be needing it for animation & names extraction.
 	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table);
-	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets->move);
+	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets.move);
 	if (movesetBlock == nullptr) { 
 		// Since movesetBlock is used by those Copy functions, we have to check for allocation failure here
 		return ExtractionErrcode_AllocationErr;
 	}
-	progress = 20;
-
-	// movelistBlock
-	movelistBlock = CopyDisplayableMovelist(movesetAddr, playerAddress, s_movelistBlock, settings);
 	progress = 35;
-
-	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
-	motaCustomBlock = CopyMotaBlocks(movesetAddr, s_motaCustomBlock, &motasList, settings);
-	progress = 50;
-
-	// Extract animations and build a map for their old address -> their new offset in our blocks
-	std::map<gameAddr, uint64_t> animOffsets;
-	animationBlock = CopyAnimations(movelist, table.moveCount, s_animationBlock, animOffsets);
-	progress = 65;
-
-	// Reads block containing names of moves and animations
-	gameAddr nameBlockStart;
-	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock, movelist, table.moveCount, nameBlockStart);
 
 	// Reads block containing basic moveset infos and aliases
 	CopyMovesetInfoBlock(movesetAddr, &movesetHeader);
 	progress = 70;
 
 	// Now that we extracted everything, we can properly convert pts to indexes
-	convertMovesetPointersToIndexes(movesetBlock, table, offsets, nameBlockStart, animOffsets);
+	convertMovesetPointersToIndexes(movesetBlock, table, &offsets);
 	progress = 75;
 
 	// -- Extraction & data conversion finished --
@@ -608,23 +579,18 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 	// 8 bytes alignment isn't strictly needed, but i've had problems in the past on misaligned structures so this is safer
 	offsetList.movesetInfoBlock = 0;
 	offsetList.tableBlock = Helpers::align8Bytes(offsetList.movesetInfoBlock + s_movesetInfoBlock);
-	offsetList.motalistsBlock = Helpers::align8Bytes(offsetList.tableBlock + s_tableBlock);
-	offsetList.nameBlock = Helpers::align8Bytes(offsetList.motalistsBlock + s_motasListBlock);
-	offsetList.movesetBlock = Helpers::align8Bytes(offsetList.nameBlock + s_nameBlock);
-	offsetList.animationBlock = Helpers::align8Bytes(offsetList.movesetBlock + s_movesetBlock);
-	offsetList.motaBlock = Helpers::align8Bytes(offsetList.animationBlock + s_animationBlock);
-	offsetList.movelistBlock = Helpers::align8Bytes(offsetList.motaBlock + s_motaCustomBlock);
+	// offsetList.nameBlock = Helpers::align8Bytes(offsetList.tableBlock + s_tableBlock);
+	offsetList.movesetBlock = Helpers::align8Bytes(offsetList.tableBlock + s_tableBlock);
 
 	ExtractionErrcode_ errcode = ExtractionErrcode_Successful;
 
 	// -- Writing the file -- 
 
-	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
-		|| animationBlock == nullptr || motaCustomBlock == nullptr || movelistBlock == nullptr)
+	if (movesetInfoBlock == nullptr || movesetBlock == nullptr)
 	{
 		errcode = ExtractionErrcode_AllocationErr;
-		DEBUG_LOG("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\nmovelistBlock = %llx\n",
-		(uint64_t)movesetInfoBlock, (uint64_t)nameBlock, (uint64_t)movesetBlock, (uint64_t)animationBlock, (uint64_t)motaCustomBlock, (uint64_t)s_movelistBlock);
+		DEBUG_LOG("movesetInfoBlock = %llx\nmovesetBlock = %llx\n",
+		(uint64_t)movesetInfoBlock, (uint64_t)movesetBlock);
 	}
 	else {
 		// Create the file
@@ -653,13 +619,8 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 				// Actual moveset data start. Accurate up to the animation block
 				{movesetInfoBlock, s_movesetInfoBlock},
 				{tableBlock, s_tableBlock },
-				{motasListBlock, s_motasListBlock},
-				{(Byte*)nameBlock, s_nameBlock},
+				// {(Byte*)nameBlock, s_nameBlock},
 				{movesetBlock, s_movesetBlock},
-				{animationBlock, s_animationBlock},
-				{motaCustomBlock, s_motaCustomBlock},
-				// Displayable movelist block
-				{movelistBlock, s_movelistBlock},
 			};
 
 			// List of blocks used for the CRC32 calculation. Some blocks above are purposefully ignored.
@@ -669,10 +630,7 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 
 				{movesetInfoBlock, s_movesetInfoBlock},
 				{tableBlock, s_tableBlock },
-				{motasListBlock, s_motasListBlock},
 				{movesetBlock, s_movesetBlock},
-				{animationBlock, s_animationBlock},
-				{motaCustomBlock, s_motaCustomBlock},
 			};
 
 			customHeader.crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
@@ -714,11 +672,8 @@ ExtractionErrcode_ ExtractorT8::Extract(gameAddr playerAddress, ExtractSettings 
 	// movesetInfoBlock: not allocated, don't free()
 	// tableBlock: not allocated, don't free()
 	// motasListBlock: not allocated, don't free()
-	free(nameBlock);
+	// free(nameBlock);
 	free(movesetBlock);
-	free(animationBlock);
-	free(motaCustomBlock);
-	free(movelistBlock);
 
 	return errcode;
 }

@@ -9,12 +9,7 @@ namespace StructsT8
 	{
 		TKMovesetHeaderBlocks_MovesetInfo = 0,
 		TKMovesetHeaderBlocks_Table       = 1,
-		TKMovesetHeaderBlocks_Motalists   = 2,
-		TKMovesetHeaderBlocks_Name        = 3,
-		TKMovesetHeaderBlocks_Moveset     = 4,
-		TKMovesetHeaderBlocks_Animation   = 5,
-		TKMovesetHeaderBlocks_Mota        = 6,
-		TKMovesetHeaderBlocks_Movelist    = 7,
+		TKMovesetHeaderBlocks_Moveset     = 2,
 	};
 
 	// Custom-made offset list containing the list of blocks that compose our extracted moveset
@@ -27,20 +22,10 @@ namespace StructsT8
 				uint64_t movesetInfoBlock;
 				// Store a list of offsets toward various structure lists paired with their size
 				uint64_t tableBlock;
-				// Store a list of offets pointing to mota files
-				uint64_t motalistsBlock;
 				// Stores an offset to the block containing move names & anim names (they are the same)
-				uint64_t nameBlock;
-				// Stores an offset to the block containing stucture lists
 				uint64_t movesetBlock;
-				// Store an offset to the block containing every regular animation used in the moveset. (customly-built)
-				uint64_t animationBlock;
-				// Store an offset to the block containing the multiple mota files for those that are extracted . (customly-built)
-				uint64_t motaBlock;
-				// Stores the .mvl file in order to show the custom movelist in training mode
-				uint64_t movelistBlock;
 			};
-			uint64_t blocks[8];
+			uint64_t blocks[3];
 		};
 
 		Byte* GetBlock(TKMovesetHeaderBlocks_ block, Byte* moveset) const
