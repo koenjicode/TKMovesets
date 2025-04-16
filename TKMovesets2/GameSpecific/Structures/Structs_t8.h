@@ -871,7 +871,7 @@ namespace StructsT8_gameAddr //todo
 		gameAddr cancel2_addr;          // offset 0xB0
 		int32_t cancel2_related;        // offset 0xB8
 		int32_t cancel2_related2;       // offset 0xBC
-		gameAddr cancel_addr3;          // offset 0xC0
+		gameAddr cancel3_addr;          // offset 0xC0
 		uint32_t cancel3_related;       // offset 0xC8
 		uint16_t transition;            // offset 0xCC
 		uint16_t _0xCE_short;           // offset 0xCE

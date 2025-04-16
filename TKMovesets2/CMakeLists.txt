@@ -39,10 +39,10 @@ set(INCLUDE_FOLDERS
                     "GameSpecific/MovesetConverters"
                     "GameSpecific/AnimExtractors"
 
-                    
+
                     "GameSpecific/EditorVisuals/EditorVisuals_t7"
                     "GameSpecific/Editors/Editor_t7"
-                    
+
                     "Layouts"
                     "Layouts/Submenus"
                     "Layouts/EditorVisuals"
@@ -75,7 +75,7 @@ set(BINARY_SOURCES
                     "GameInteractions/GameImport.cpp"
                     "GameInteractions/GameSharedMem.cpp"
                     "GameInteractions/GameProcess/GameData.cpp"
-                    "GameInteractions/GameProcess/GameProcess.cpp"  
+                    "GameInteractions/GameProcess/GameProcess.cpp"
 
                     "LocalStorage/LocalStorage.cpp"
 
@@ -125,11 +125,12 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/MovesetConverters/Aliases.cpp"
                     "GameSpecific/MovesetConverters/MovesetFileConverter.cpp"
                     "GameSpecific/AnimExtractors/AnimExtractors.cpp"
-                    
+
                     # Game-specific
                     "GameSpecific/Editors/TEditor.cpp"
                     ##T8
                     "GameSpecific/Online/Online_t8.cpp"
+                    "GameSpecific/Extractors/Extractor_t8/Extractor_t8.cpp"
                     ### Editor logic
                     #"GameSpecific/Editors/Editor_t8/Editor_t8.cpp"
                     #"GameSpecific/Editors/Editor_t8/Editor_t8_Forms.cpp"
@@ -218,7 +219,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/AnimExtractors/AnimExtractor_t5dr.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5dr_to_t7_Aliases.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5dr_to_t7.cpp"
-)                   
+)
 
 # This will be included in the .dll and should only be related to the injected DLL
 set(MOVESETLOADER_SOURCES
@@ -240,7 +241,7 @@ set(MOVESETLOADER_SOURCES
     "ResourcesClasses/GameAddressesWrapper.cpp"
     "Utils/helpers.cpp"
     "Utils/Compression.cpp"
-    
+
     "GameSpecific/MovesetConverters/Aliases.cpp"
 
     # Converters

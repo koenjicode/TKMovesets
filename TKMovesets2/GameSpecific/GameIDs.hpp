@@ -20,6 +20,8 @@ namespace GameVersions
 			DEFAULT = 0,
 
 			CLOSED_NETWORK_TEST,
+			CLOSED_BETA_TEST,
+			DEMO,
 		};
 	}
 
